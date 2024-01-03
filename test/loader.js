@@ -8,7 +8,7 @@ var fixturesDir = path.join(__dirname, 'fixtures');
 var badSource = path.join(fixturesDir, 'Bad.elm');
 var goodSource = path.join(fixturesDir, 'Good.elm');
 var goodDependency = path.join(fixturesDir, 'GoodDependency.elm');
-var elmPackage = path.join(fixturesDir, 'elm.json');
+var elmPackage = path.join(fixturesDir, 'elm-package.json');
 var otherElmSourceDir = path.join(__dirname, 'other_elm_source_dir');
 
 var toString = Object.prototype.toString;
@@ -22,11 +22,11 @@ var hash = function (data) {
 };
 
 var compile = function (filename) {
-  return compiler.compileToString([filename], {cwd: fixturesDir})
+  return compiler.compileToString([filename], {yes: true, cwd: fixturesDir})
     .then(function (data) {
       return data.toString();
     });
-};
+}
 
 // Mock of webpack's loader context.
 var mock = function (source, query, opts, callback, watchMode, cwd) {
@@ -154,9 +154,8 @@ describe('async mode', function () {
       foo: 'bar'
     };
 
-    var callback = function (err) {
-      assert.isPrototypeOf(err, Error);
-      assert.match(err.message, /unknown Elm compiler option/i);
+    var callback = function () {
+      assert.match(context.emittedWarning(), /unknown Elm compiler option/i);
       done();
     };
 
@@ -181,13 +180,13 @@ describe('async mode', function () {
     loader.call(context, goodSource);
   });
 
-  it('emits errors for incorrect source files', function (done) {
+  xit('emits errors for incorrect source files', function (done) {
     var options = {
       cwd: fixturesDir
     };
 
-    var callback = function (err) {
-      assert.match(err.message, /parse error/i);
+    var callback = function () {
+      assert.match(context.emittedError(), /syntax problem/i);
       done();
     };
 

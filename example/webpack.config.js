@@ -1,28 +1,41 @@
-var path = require('path');
-
 module.exports = {
-  // If your entry-point is at "src/index.js" and
-  // your output is in "/dist", you can ommit
-  // these parts of the config
+  entry: './src/index.js',
+
+  output: {
+    path: __dirname + '/dist',
+    filename: 'index.js'
+  },
+
+  resolve: {
+    extensions: ['.js', '.elm']
+  },
+
   module: {
-    rules: [{
+    rules: [
+      {
         test: /\.html$/,
         exclude: /node_modules/,
-        loader: 'file-loader'
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]'
+          }
+        }
       },
       {
         test: /\.elm$/,
         exclude: [/elm-stuff/, /node_modules/],
-        // This is what you need in your own work
-        // loader: "elm-webpack-loader",
-        loader: '../index.js'
+        use: {
+          loader: '../index.js'
+        }
       }
-    ]
+    ],
+
+    noParse: /\.elm$/
   },
 
   devServer: {
-    contentBase: path.join(__dirname, "src"),
+    inline: true,
     stats: 'errors-only'
-  },
-
+  }
 };
